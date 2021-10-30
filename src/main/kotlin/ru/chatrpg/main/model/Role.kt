@@ -15,6 +15,6 @@ class Role {
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     @Column(name = "id", unique = true)
-    val id: String = ""
-    val name: String = ""
+    var id: String = ""
+    var name: String = ""
 }

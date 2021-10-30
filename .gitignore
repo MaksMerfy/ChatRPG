@@ -1,6 +1,5 @@
 HELP.md
 target/
-!.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###
 .apt_generated
@@ -18,3 +17,4 @@ target/
 *.ipr
 
 /src/main/resources/application.properties
+.mvn

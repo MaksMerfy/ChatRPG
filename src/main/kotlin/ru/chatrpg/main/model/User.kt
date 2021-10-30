@@ -11,10 +11,10 @@ class User {
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     @Column(name = "id", unique = true)
-    val id: String = ""
-    val username: String = ""
-    val password: String = ""
-    val passwordConfirm: String = ""
+    var id: String = ""
+    var username: String = ""
+    var password: String = ""
+    var passwordConfirm: String = ""
     @ManyToOne
-    val role: Role = Role()
+    var role: Role? = Role()
 }

@@ -5,7 +5,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -15,8 +14,7 @@ import java.util.Date;
 @Component
 @Slf4j
 class JwtProvider {
-    @Value("$(jwt.secret)")
-    private lateinit var jwtSecret: String
+    private val jwtSecret: String = "YourJWTTokenOnProd"
     fun generateToken(login: String?): String {
         val date = Date.from(LocalDate.now().plusDays(15).atStartOfDay(ZoneId.systemDefault()).toInstant())
         return Jwts.builder()

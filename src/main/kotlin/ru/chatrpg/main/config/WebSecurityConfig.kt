@@ -32,6 +32,8 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
             .and()
             .authorizeRequests()
             .antMatchers("/").permitAll()
+            .antMatchers("/login").permitAll()
+            .antMatchers("/registration").permitAll()
             .antMatchers("/*").authenticated()
             .and()
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)
