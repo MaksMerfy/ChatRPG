@@ -1,7 +1,8 @@
 package ru.chatrpg.main.services.impl
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
+
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.stereotype.Service
 import ru.chatrpg.main.model.User
 
 
@@ -9,9 +10,9 @@ import ru.chatrpg.main.model.User
 class UserDetailsImpl : UserDetails {
     private var login: String = ""
     private var password: String = ""
-    private val grantedAuthorities: Collection<GrantedAuthority?>? = null
-    override fun getAuthorities(): Collection<GrantedAuthority?> {
-        return grantedAuthorities!!
+    private val grantedAuthorities: Collection<GrantedAuthority>? = null
+    override fun getAuthorities(): Collection<GrantedAuthority>? {
+        return grantedAuthorities
     }
 
     override fun getPassword(): String {

@@ -20,9 +20,10 @@ import javax.servlet.http.HttpServletRequest
 class JwtFilter : GenericFilterBean() {
     @Autowired
     private lateinit var jwtProvider: JwtProvider
-
     @Autowired
     private lateinit var userDetailsServiceImpl: UserDetailsServiceImpl
+
+    private val AUTHORIZATION: String = "Authorization"
 
     @Throws(IOException::class, ServletException::class)
     override fun doFilter(servletRequest: ServletRequest, servletResponse: ServletResponse, filterChain: FilterChain) {
@@ -42,9 +43,5 @@ class JwtFilter : GenericFilterBean() {
         return if (hasText(bearer) && bearer.startsWith("Bearer ")) {
             bearer.substring(7)
         } else null
-    }
-
-    companion object {
-        const val AUTHORIZATION = "Authorization"
     }
 }

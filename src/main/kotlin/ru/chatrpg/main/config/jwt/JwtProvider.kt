@@ -1,15 +1,15 @@
 package ru.chatrpg.main.config.jwt
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.extern.slf4j.Slf4j;
+import io.jsonwebtoken.Claims
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
+import lombok.extern.slf4j.Slf4j
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Component
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
+import java.time.LocalDate
+import java.time.ZoneId
+import java.util.Date
 
 @Component
 @Slf4j
@@ -36,7 +36,7 @@ class JwtProvider {
     }
 
     fun getLoginFromToken(token: String?): String {
-        val claims: Claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody()
+        val claims: Claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).body
         return claims.subject
     }
 }

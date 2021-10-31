@@ -1,6 +1,6 @@
 package ru.chatrpg.main.dto.requestes
 
-data class LoginRequest(
+data class LoginPageRequest(
     val login: String = "",
     val password: String = ""
 )
