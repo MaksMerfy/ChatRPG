@@ -13,6 +13,8 @@ class User {
     @Column(name = "id", unique = true)
     var id: String = ""
     var username: String = ""
+    var email: String = ""
+    var nickname: String = ""
     var password: String = ""
     var passwordConfirm: String = ""
     @ManyToOne

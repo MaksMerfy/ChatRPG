@@ -5,4 +5,5 @@ import ru.chatrpg.main.model.User
 
 interface UserRepository: JpaRepository<User, String> {
     fun findByUsername(username: String): User?
+    fun findByEmail(email: String): User?
 }

@@ -6,6 +6,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.TestPropertySource
+import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
@@ -15,10 +16,11 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPat
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
+@Sql(value = ["/sql-before-test.sql"], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 internal class AuthControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
-    private val token: String = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJNYWtzTWVyZnkiLCJleHAiOjE2MzY5MjM2MDB9.vYwAmJHiX462pgUBGyLPxG4zNYO0md89Knt5J9z1slCBQnhHZXfrYuc13hvuuhHA44ib6tTfwZMeH5qkGKR4Lw"
+    private val token: String = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJNYWtzTWVyZnkiLCJleHAiOjE2MzcwMTAwMDB9.-BoSJgWdKLg5_C1la-LaqyLP7UX0Pq4EF5BjKItvk3PyDpIdTDLrbE6MB4VNH_2pqq4usBeS1GwIQdRpJyFBSg"
 
     @Test
     fun loginPost() {
@@ -32,7 +34,7 @@ internal class AuthControllerTest {
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.token").value(""))
-            .andExpect(jsonPath("$.errorMassage").value("Login not found"))
+            .andExpect(jsonPath("$.errorMessage").value("Login not found"))
 
         //wrong json
         this.mockMvc.perform(post("/login")
@@ -40,7 +42,7 @@ internal class AuthControllerTest {
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.token").value(""))
-            .andExpect(jsonPath("$.errorMassage").value("Login not found"))
+            .andExpect(jsonPath("$.errorMessage").value("Login not found"))
 
         //Wrong login and password
         this.mockMvc.perform(post("/login")
@@ -48,7 +50,7 @@ internal class AuthControllerTest {
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.token").value(""))
-            .andExpect(jsonPath("$.errorMassage").value("Login not found"))
+            .andExpect(jsonPath("$.errorMessage").value("Login not found"))
 
         //Wrong password
         this.mockMvc.perform(post("/login")
@@ -56,7 +58,7 @@ internal class AuthControllerTest {
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.token").value(""))
-            .andExpect(jsonPath("$.errorMassage").value("Wrong login or password"))
+            .andExpect(jsonPath("$.errorMessage").value("Wrong login or password"))
 
         //login and password normal
         this.mockMvc.perform(post("/login")
@@ -64,7 +66,7 @@ internal class AuthControllerTest {
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.token").value(token))
-            .andExpect(jsonPath("$.errorMassage").value(""))
+            .andExpect(jsonPath("$.errorMessage").value(mutableListOf<String>()))
 
     }
 
@@ -75,6 +77,127 @@ internal class AuthControllerTest {
 
     @Test
     fun registrationPost() {
+        val errorList: MutableList<String> = mutableListOf()
+        errorList.add("Wrong username")
+        errorList.add("Length username must be more 4 symbols")
+        errorList.add("Wrong email")
+        errorList.add("Length password must be more 6 symbols")
+
+        //Test page
+        this.mockMvc.perform(post("/registration"))
+            .andExpect(status().is4xxClientError)
+
+        //Empty json
+        this.mockMvc.perform(post("/registration")
+            .content("{}")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.token").value(""))
+            .andExpect(jsonPath("$.errorMessage").value(errorList))
+
+        //wrong json
+        this.mockMvc.perform(post("/registration")
+            .content("{ \"usernames\": \"testUser\"}")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.token").value(""))
+            .andExpect(jsonPath("$.errorMessage").value(errorList))
+
+        //wrong username
+        errorList.clear()
+        errorList.add("Length username must be more 4 symbols")
+        errorList.add("Wrong email")
+        errorList.add("Length password must be more 6 symbols")
+
+        this.mockMvc.perform(post("/registration")
+            .content("{ \"username\": \"test\"}")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.token").value(""))
+            .andExpect(jsonPath("$.errorMessage").value(errorList))
+
+        //Correct username
+        errorList.clear()
+        errorList.add("Wrong email")
+        errorList.add("Length password must be more 6 symbols")
+
+        this.mockMvc.perform(post("/registration")
+            .content("{ \"username\": \"testMyUser\"}")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.token").value(""))
+            .andExpect(jsonPath("$.errorMessage").value(errorList))
+
+        //Correct username in base
+        errorList.clear()
+        errorList.add("User with this username is exists")
+        errorList.add("Wrong email")
+        errorList.add("Length password must be more 6 symbols")
+
+        this.mockMvc.perform(post("/registration")
+            .content("{ \"username\": \"testUser\"}")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.token").value(""))
+            .andExpect(jsonPath("$.errorMessage").value(errorList))
+
+        //Wrong email
+        errorList.clear()
+        errorList.add("Wrong email")
+        errorList.add("Length password must be more 6 symbols")
+
+        this.mockMvc.perform(post("/registration")
+            .content("{ \"username\": \"testMyUser\", \"email\": \"testMyUser\"}")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.token").value(""))
+            .andExpect(jsonPath("$.errorMessage").value(errorList))
+
+        //Correct user and email
+        errorList.clear()
+        errorList.add("Length password must be more 6 symbols")
+
+        this.mockMvc.perform(post("/registration")
+            .content("{ \"username\": \"testMyUser\", \"email\": \"testMyUser@testMyUser.ru\"}")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.token").value(""))
+            .andExpect(jsonPath("$.errorMessage").value(errorList))
+
+        //Correct user and email and wrong password
+        errorList.clear()
+        errorList.add("Length password must be more 6 symbols")
+        errorList.add("Password must be equals confirm password")
+
+        this.mockMvc.perform(post("/registration")
+            .content("{ \"username\": \"testMyUser\", \"email\": \"testMyUser@testMyUser.ru\", \"password\": \"123\"}")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.token").value(""))
+            .andExpect(jsonPath("$.errorMessage").value(errorList))
+
+        //Correct user and email and password and wrong passwordConfirm
+        errorList.clear()
+        errorList.add("Password must be equals confirm password")
+
+        this.mockMvc.perform(post("/registration")
+            .content("{ \"username\": \"testMyUser\", \"email\": \"testMyUser@testMyUser.ru\", \"password\": \"123456\"}")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.token").value(""))
+            .andExpect(jsonPath("$.errorMessage").value(errorList))
+
+        //Correct user and email and password and wrong passwordConfirm
+        errorList.clear()
+        errorList.add("User with this username is exists")
+        errorList.add("User with this email is exists")
+
+        this.mockMvc.perform(post("/registration")
+            .content("{ \"username\": \"testUser\", \"email\": \"testUser@testuser.ru\", \"password\": \"123456\", \"passwordConfirm\": \"123456\"}")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.token").value(""))
+            .andExpect(jsonPath("$.errorMessage").value(errorList))
     }
 
     @Test

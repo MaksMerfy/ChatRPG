@@ -34,8 +34,12 @@ class UserServiceImpl: UserService {
     }
 
     override fun findByUserNameAndPassword(userName: String, password: String): User? {
-        var user: User? = findByUserName(userName)
+        val user: User? = findByUserName(userName)
         if (user != null && passwordEncoder.matches(password, user.password)) return user;
         return null;
+    }
+
+    override fun findByEmail(email: String): User? {
+        return userRepository.findByEmail(email)
     }
 }
