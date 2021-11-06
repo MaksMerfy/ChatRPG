@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RestController
 import ru.chatrpg.main.controllers.AuthControllerApi
 import ru.chatrpg.main.dto.requestes.LoginRequest
 import ru.chatrpg.main.dto.requestes.RegistrationRequest
-import ru.chatrpg.main.dto.responses.LoginResponse
-import ru.chatrpg.main.dto.responses.MainAuthResponse
+import ru.chatrpg.main.dto.responses.impl.LoginResponse
+import ru.chatrpg.main.dto.responses.impl.MainAuthResponse
 import ru.chatrpg.main.services.AuthService
 
 @RestController

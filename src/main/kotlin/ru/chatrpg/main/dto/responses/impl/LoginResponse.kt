@@ -1,4 +1,4 @@
-package ru.chatrpg.main.dto.responses
+package ru.chatrpg.main.dto.responses.impl
 
 data class LoginResponse(
     var token: String = "",

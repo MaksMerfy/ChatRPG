@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 import ru.chatrpg.main.controllers.MainControllerApi
-import ru.chatrpg.main.dto.responses.MainAuthResponse
+import ru.chatrpg.main.dto.responses.impl.MainAuthResponse
 import ru.chatrpg.main.services.AuthService
 import javax.servlet.http.HttpServletRequest
 

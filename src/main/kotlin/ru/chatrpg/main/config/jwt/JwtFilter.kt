@@ -10,6 +10,7 @@ import org.springframework.web.filter.GenericFilterBean
 import ru.chatrpg.main.services.impl.UserDetailsImpl
 import ru.chatrpg.main.services.impl.UserDetailsServiceImpl
 import java.io.IOException
+import java.util.*
 import javax.servlet.FilterChain
 import javax.servlet.ServletException
 import javax.servlet.ServletRequest
@@ -29,7 +30,7 @@ class JwtFilter : GenericFilterBean() {
     override fun doFilter(servletRequest: ServletRequest, servletResponse: ServletResponse, filterChain: FilterChain) {
         val token = getTokenFromRequest(servletRequest as HttpServletRequest)
         if (token != null && jwtProvider.validateToken(token)) {
-            val userName: String = jwtProvider.getLoginFromToken(token)
+            val userName: String = jwtProvider.getLoginFromToken(token).lowercase(Locale.getDefault())
             val userDetailsService: UserDetailsImpl = userDetailsServiceImpl.loadUserByUsername(userName) ?: throw UsernameNotFoundException(userName)
             val auth =
                 UsernamePasswordAuthenticationToken(userDetailsService, null, userDetailsService.authorities)

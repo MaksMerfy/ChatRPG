@@ -7,11 +7,15 @@ import org.springframework.stereotype.Service
 import ru.chatrpg.main.config.jwt.JwtProvider
 import ru.chatrpg.main.dto.requestes.LoginRequest
 import ru.chatrpg.main.dto.requestes.RegistrationRequest
-import ru.chatrpg.main.dto.responses.LoginResponse
-import ru.chatrpg.main.dto.responses.MainAuthResponse
+import ru.chatrpg.main.dto.responses.impl.LoginResponse
+import ru.chatrpg.main.dto.responses.impl.MainAuthResponse
+import ru.chatrpg.main.exceptions.SaveRepositoryExeption
+import ru.chatrpg.main.model.Hero
 import ru.chatrpg.main.model.User
 import ru.chatrpg.main.services.AuthService
+import ru.chatrpg.main.services.HeroService
 import ru.chatrpg.main.services.UserService
+import java.util.*
 import java.util.regex.Pattern
 
 
@@ -21,14 +25,25 @@ class AuthServiceImpl: AuthService {
     private lateinit var jwtProvider: JwtProvider
     @Autowired
     private lateinit var userService: UserService
+    @Autowired
+    private lateinit var heroService: HeroService
 
     private val emailPatern = Pattern.compile("[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}\\@[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}(\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25})")
 
     override fun login(loginRequest: LoginRequest): LoginResponse {
+        //Create response
         val loginResponse = LoginResponse()
-        var user: User? = userService.findByUserName(loginRequest.login)
+
+        //Try find user by email or username
+        var user: User? = if (emailPatern.matcher(loginRequest.login).matches()) {
+            userService.findByEmail(loginRequest.login.lowercase(Locale.getDefault()))
+        } else {
+            userService.findByUserName(loginRequest.login.lowercase(Locale.getDefault()))
+        }
+
+        //If find user we must check on correct password
         if (user != null) {
-            user = userService.findByUserNameAndPassword(loginRequest.login, loginRequest.password)
+            user = userService.findByUserNameAndPassword(user.username, loginRequest.password)
             if (user != null) {
                 loginResponse.token = jwtProvider.generateToken(user.username)
             } else {
@@ -45,16 +60,16 @@ class AuthServiceImpl: AuthService {
         validateRegistrationRequest(registrationRequest, loginResponse)
         if (loginResponse.errorMessage.isEmpty()) {
             val user = User()
-            user.username = registrationRequest.username
-            user.email = registrationRequest.email
+            user.username = registrationRequest.username.lowercase(Locale.getDefault())
+            user.email = registrationRequest.email.lowercase(Locale.getDefault())
             user.nickname = registrationRequest.nickname
-            if (user.nickname == "") user.nickname = user.username
+            if (user.nickname == "") user.nickname = registrationRequest.username
             user.password = registrationRequest.password
-            val userSaved: User? = userService.saveUser(user)
-            if (userSaved != null) {
+            try {
+                val userSaved: User = userService.saveUser(user) ?: throw SaveRepositoryExeption("")
+                val heroSaved: Hero = heroService.saveNewHero(userSaved) ?: throw SaveRepositoryExeption("")
                 loginResponse.token = jwtProvider.generateToken(userSaved.username)
-            } else
-            {
+            } catch (e: SaveRepositoryExeption){
                 loginResponse.errorMessage += "Can't register user"
             }
         }
@@ -65,9 +80,9 @@ class AuthServiceImpl: AuthService {
     override fun validateRegistrationRequest(registrationRequest: RegistrationRequest, loginResponse: LoginResponse) {
         if (registrationRequest.username == "") loginResponse.errorMessage.add("Wrong username")
         if (registrationRequest.username.length < 5 ) loginResponse.errorMessage.add("Length username must be more 4 symbols")
-        if (userService.findByUserName(registrationRequest.username) != null) loginResponse.errorMessage.add("User with this username is exists")
+        if (userService.findByUserName(registrationRequest.username.lowercase(Locale.getDefault())) != null) loginResponse.errorMessage.add("User with this username is exists")
         if (!emailPatern.matcher(registrationRequest.email).matches()) loginResponse.errorMessage.add("Wrong email")
-        if (userService.findByEmail(registrationRequest.email) != null) loginResponse.errorMessage.add("User with this email is exists")
+        if (userService.findByEmail(registrationRequest.email.lowercase(Locale.getDefault())) != null) loginResponse.errorMessage.add("User with this email is exists")
         if (registrationRequest.password.length < 6) loginResponse.errorMessage.add("Length password must be more 6 symbols")
         if (registrationRequest.password != registrationRequest.passwordConfirm) loginResponse.errorMessage.add("Password must be equals confirm password")
     }
@@ -80,9 +95,10 @@ class AuthServiceImpl: AuthService {
     override fun getNickNameFromAuthenticate(): MainAuthResponse {
         val mainAuthResponse = MainAuthResponse()
         val authentication: Authentication? = SecurityContextHolder.getContext().authentication
-        if (authentication != null && authentication.isAuthenticated) {
-            mainAuthResponse.nickName = authentication.name
-            mainAuthResponse.nickName = mainAuthResponse.nickName.replace("anonymousUser", "")
+        if (authentication != null
+            && authentication.isAuthenticated
+            && authentication.name != "anonymousUser") {
+            mainAuthResponse.nickname = userService.findByUserName(authentication.name)?.nickname ?: ""
         }
         return mainAuthResponse
     }

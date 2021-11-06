@@ -18,8 +18,8 @@ class UserServiceImpl: UserService {
     @Autowired
     private lateinit var passwordEncoder: PasswordEncoder
 
-    override fun saveUser(user: User): User? {
-        var userForReturn: User = user
+    override fun saveUser(user: User?): User? {
+        var userForReturn: User? = user
         if (user != null){
             user.role = roleRepository.findByName("Role_User")
             user.password = passwordEncoder.encode(user.password)
