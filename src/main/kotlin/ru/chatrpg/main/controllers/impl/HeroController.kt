@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import ru.chatrpg.main.controllers.HeroControllerApi
 import ru.chatrpg.main.dto.responses.HeroResponse
+import ru.chatrpg.main.model.Hero
 import ru.chatrpg.main.services.HeroService
 
 @RestController

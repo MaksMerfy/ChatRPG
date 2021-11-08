@@ -1,37 +1,25 @@
 package ru.chatrpg.main.dto.responses.impl
 
-import com.fasterxml.jackson.annotation.JsonGetter
 import ru.chatrpg.main.dto.responses.HeroResponse
+import ru.chatrpg.main.model.Hero
 
 data class HeroResponseImpl(
     var nickname: String = "",
-    var HP: Int = 0,
-    var Mana: Int = 0,
-    var Damage: Int = 0,
-    var CriticalChance: Int = 0,
-    var Armor: Int = 0,
-    var Experience: Int = 0
-) : HeroResponse {
+    var strength: Int = 0,
+    var dexterity: Int = 0,
+    var intellegy: Int = 0
+): HeroResponse {
+    override fun convertFromHero(hero: Hero?) {
+        if (hero != null) {
+            this.nickname = hero.user.nickname
+            for (stat in hero.stats) {
+                when (stat.name) {
+                    "strength" -> this.strength = stat.value
+                    "dexterity" -> this.dexterity = stat.value
+                    "intellegy" -> this.intellegy = stat.value
+                }
+            }
+        }
 
-    override fun getnickname(): String {
-        return this.nickname
-    }
-    override fun gethp(): Int {
-        return this.HP
-    }
-    override fun getmana(): Int {
-        return this.Mana
-    }
-    override fun getdamage(): Int {
-        return this.Damage
-    }
-    override fun getcriticalChance(): Int {
-        return this.CriticalChance
-    }
-    override fun getarmor(): Int {
-        return this.Armor
-    }
-    override fun getexperience(): Int {
-        return this.Experience
     }
 }

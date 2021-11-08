@@ -1,6 +1,7 @@
 package ru.chatrpg.main.model
 
 import org.hibernate.annotations.GenericGenerator
+import ru.chatrpg.main.model.stats.Stat
 import javax.persistence.*
 
 @Entity
@@ -11,13 +12,8 @@ class Hero {
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     @Column(name = "id", unique = true)
     var id: String = ""
-
     @OneToOne
     lateinit var user: User
-    var hp: Int = 100
-    var mana: Int = 10
-    var damage: Int = 1
-    var armor: Int = 1
-    var criticalChance: Int = 0
-    var experience: Int = 0
+    @OneToMany
+    lateinit var stats: MutableList<Stat>
 }
