@@ -27,47 +27,89 @@ internal class HeroControllerTest {
             .andExpect(MockMvcResultMatchers.status().is4xxClientError)
     }
 
-    /*@Test
+    @Test
     fun heroGetCheckEndPoint() {
         //Test page with Get
+        val emptyList: MutableList<String> = mutableListOf<String>()
         this.mockMvc.perform(MockMvcRequestBuilders.get("/hero"))
             .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
             .andExpect(MockMvcResultMatchers.jsonPath("$.nickname").value(""))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.hp").value(0))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.mana").value(0))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.damage").value(0))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.armor").value(0))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.criticalChance").value(0))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.experience").value(0))
-    }*/
+            .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessages").value(emptyList))
+    }
 
-    /*@Test
+    @Test
     fun heroGetCheckWrongBearer() {
         //Test page with Get and wrond baerer
+        val emptyList: MutableList<String> = mutableListOf<String>()
         this.mockMvc.perform(MockMvcRequestBuilders.get("/hero")
             .header("authorization", "Bearer "))
             .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
             .andExpect(MockMvcResultMatchers.jsonPath("$.nickname").value(""))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.hp").value(0))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.mana").value(0))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.damage").value(0))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.armor").value(0))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.criticalChance").value(0))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.experience").value(0))
-    }*/
+            .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessages").value(emptyList))
+    }
 
-    /*@Test
+    @Test
     fun heroGetCheckValidBearer() {
         //Test page with Get and valid baerer
+        val emptyList: MutableList<String> = mutableListOf<String>()
         this.mockMvc.perform(MockMvcRequestBuilders.get("/hero")
             .header("authorization", "Bearer $token"))
             .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
             .andExpect(MockMvcResultMatchers.jsonPath("$.nickname").value("MaksMerfy"))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.hp").value(100))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.mana").value(10))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.damage").value(1))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.armor").value(1))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.criticalChance").value(0))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.experience").value(0))
-    }*/
+            .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessages").value(emptyList))
+    }
+
+    @Test
+    fun heroUpdatePostCheckEndPoint() {
+        //Test update page with Post
+        val emptyList: MutableList<String> = mutableListOf<String>()
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/hero/update"))
+            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.nickname").value(""))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessages").value(emptyList))
+    }
+
+    @Test
+    fun heroUpdatePostWrongToken() {
+        //Test post update page with wrong token
+        val emptyList: MutableList<String> = mutableListOf<String>()
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/hero/update")
+            .header("authorization", "Bearer "))
+            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.nickname").value(""))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessages").value(emptyList))
+    }
+
+    @Test
+    fun heroUpdatePostValidToken() {
+        //Test post update page with wrong token
+        val emptyList: MutableList<String> = mutableListOf<String>()
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/hero/update")
+            .header("authorization", "Bearer $token"))
+            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.nickname").value("MaksMerfy"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessages").value(emptyList))
+    }
+
+    @Test
+    fun heroUpdatePostEmptyStat() {
+        //Test post update page with wrong token
+        val emptyList: MutableList<String> = mutableListOf<String>()
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/hero/update?Stat=")
+            .header("authorization", "Bearer $token"))
+            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.nickname").value("MaksMerfy"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessages").value(emptyList))
+    }
+
+    @Test
+    fun heroUpdatePostValidUpdate() {
+        //Test post update page with wrong token
+        val emptyList: MutableList<String> = mutableListOf<String>()
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/hero/update?Stat=dexterity")
+            .header("authorization", "Bearer $token"))
+            .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.nickname").value("MaksMerfy"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessages").value(emptyList))
+    }
 }

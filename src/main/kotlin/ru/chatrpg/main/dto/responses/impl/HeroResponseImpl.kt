@@ -5,20 +5,16 @@ import ru.chatrpg.main.model.Hero
 
 data class HeroResponseImpl(
     var nickname: String = "",
-    var strength: Int = 0,
-    var dexterity: Int = 0,
-    var intellegy: Int = 0
+    var listStats: MutableMap<String, Int> = mutableMapOf<String, Int>(),
+    var errorMessages: MutableList<String> = mutableListOf<String>()
 ): HeroResponse {
-    override fun convertFromHero(hero: Hero?) {
+    override fun convertFromHero(hero: Hero?, errorMessages: MutableList<String>) {
         if (hero != null) {
             this.nickname = hero.user.nickname
             for (stat in hero.stats) {
-                when (stat.name) {
-                    "strength" -> this.strength = stat.value
-                    "dexterity" -> this.dexterity = stat.value
-                    "intellegy" -> this.intellegy = stat.value
-                }
+                this.listStats.put(stat.name, stat.value)
             }
+            this.errorMessages = errorMessages
         }
 
     }

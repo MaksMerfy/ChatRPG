@@ -1,11 +1,11 @@
-package ru.chatrpg.main.model.stats
+package ru.chatrpg.main.model
 
 import org.hibernate.annotations.GenericGenerator
 import javax.persistence.*
 
 @Entity
 @Table(name = "stats")
-class Stat: IntStat {
+class Stat {
     @Id
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
@@ -14,11 +14,9 @@ class Stat: IntStat {
     var name: String = ""
     var value: Int = 1
 
-    override fun needExpForUpdate(): Int {
-        return 100 + ((this.value - 1) * 10)
+    constructor(name: String, value: Int) {
+        this.name = name
+        this.value = value
     }
 
-    override fun update() {
-        this.value += 1
-    }
 }

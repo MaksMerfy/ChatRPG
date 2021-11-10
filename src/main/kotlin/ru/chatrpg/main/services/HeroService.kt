@@ -8,5 +8,5 @@ interface HeroService {
     fun saveNewHero(user: User): Hero?
     fun findById(id: String): Hero?
     fun findByUserNickname(): HeroResponse
-    fun updateHeroStats(stats: String) : HeroResponse
+    fun updateHeroStats(stats: String?) : HeroResponse
 }

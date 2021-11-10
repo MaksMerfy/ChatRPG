@@ -67,7 +67,7 @@ class AuthServiceImpl: AuthService {
             user.password = registrationRequest.password
             try {
                 val userSaved: User = userService.saveUser(user) ?: throw SaveRepositoryExeption("")
-                val heroSaved: Hero = heroService.saveNewHero(userSaved) ?: throw SaveRepositoryExeption("")
+                heroService.saveNewHero(userSaved) ?: throw SaveRepositoryExeption("")
                 loginResponse.token = jwtProvider.generateToken(userSaved.username)
             } catch (e: SaveRepositoryExeption){
                 loginResponse.errorMessage += "Can't register user"

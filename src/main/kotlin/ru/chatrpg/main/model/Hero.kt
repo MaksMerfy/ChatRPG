@@ -1,7 +1,6 @@
 package ru.chatrpg.main.model
 
 import org.hibernate.annotations.GenericGenerator
-import ru.chatrpg.main.model.stats.Stat
 import javax.persistence.*
 
 @Entity

@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPat
 internal class AuthControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
-    private val token: String = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJtYWtzbWVyZnkiLCJleHAiOjE2Mzc2MTQ4MDB9.SBH3Fe5Plp15GswdDbDQcS5bGyFlatzQKYoEH180hwNSN3ZivHRymj8PfBj27uzzfSqjqvwMe4goVyaxEM2jGA"
+    private val token: String = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJtYWtzbWVyZnkiLCJleHAiOjE2Mzc3ODc2MDB9.wayaWknjRxMVoWsqxb407NnHRxs2XcVLIDLDDR81hGaLvVVDHjgMvN9-9Ij5gIdAX-slqh_sj74C3IO7b2j8EA"
 
     @Test
     fun loginPostCheckEndPoint() {

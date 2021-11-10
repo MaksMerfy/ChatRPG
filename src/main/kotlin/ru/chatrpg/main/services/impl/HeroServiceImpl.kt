@@ -1,20 +1,20 @@
 package ru.chatrpg.main.services.impl
 
+import com.sun.jdi.request.StepRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import ru.chatrpg.main.dto.responses.HeroResponse
 import ru.chatrpg.main.dto.responses.impl.HeroResponseImpl
 import ru.chatrpg.main.model.Hero
 import ru.chatrpg.main.model.User
-import ru.chatrpg.main.model.stats.ListStats
-import ru.chatrpg.main.model.stats.Stat
+import ru.chatrpg.main.model.Stat
 import ru.chatrpg.main.repositories.HeroRepository
 import ru.chatrpg.main.services.AuthService
 import ru.chatrpg.main.services.HeroService
 import ru.chatrpg.main.services.StatService
 
 @Service
-class HeroServiceImpl: HeroService {
+class HeroServiceImpl : HeroService {
     @Autowired
     private lateinit var heroRepository: HeroRepository
 
@@ -28,12 +28,8 @@ class HeroServiceImpl: HeroService {
         val hero = Hero()
         hero.user = user
         hero.stats = mutableListOf<Stat>()
-        for (curStat in ListStats.values()){
-            var stat = Stat()
-            stat.name = curStat.name
-            stat.value = 1
-            stat = statService.save(stat)
-            hero.stats.add(stat)
+        for (stat in statService.findAllBaseStats()) {
+            hero.stats.add(statService.save(Stat(stat.name, stat.value)))
         }
         return heroRepository.save(hero)
     }
@@ -45,20 +41,27 @@ class HeroServiceImpl: HeroService {
     override fun findByUserNickname(): HeroResponse {
         val authResponse = authService.getNickNameFromAuthenticate()
         val heroResponse: HeroResponse = HeroResponseImpl()
-        heroResponse.convertFromHero(heroRepository.findHeroByUserNickname(authResponse.nickname))
+        heroResponse.convertFromHero(heroRepository.findHeroByUserNickname(authResponse.nickname), mutableListOf<String>())
         return heroResponse
     }
 
-    override fun updateHeroStats(stats: String): HeroResponse {
+    override fun updateHeroStats(stats: String?): HeroResponse {
+        val errorMessages: MutableList<String> = mutableListOf<String>()
         val authResponse = authService.getNickNameFromAuthenticate()
         val heroResponse: HeroResponse = HeroResponseImpl()
         val hero = heroRepository.findHeroByUserNickname(authResponse.nickname)
         val stat = hero?.stats?.find { stat -> stat.name == stats }
-        if (stat != null){
-            stat.update()
-            statService.save(stat)
+        val expStat = hero?.stats?.find { item -> item.name == "experience" }
+        if (stat != null && expStat != null) {
+            val needExp = statService.needExpForUpdate(stat)
+            if (needExp <= expStat.value) {
+                expStat.value -= needExp
+                statService.save(expStat)
+                statService.update(stat)
+                statService.save(stat)
+            } else { errorMessages.add("Need experience $needExp") }
         }
-        heroResponse.convertFromHero(hero)
+        heroResponse.convertFromHero(hero, errorMessages)
         return heroResponse
     }
 }

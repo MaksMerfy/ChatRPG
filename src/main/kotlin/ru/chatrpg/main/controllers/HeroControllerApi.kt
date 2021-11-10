@@ -6,5 +6,5 @@ import ru.chatrpg.main.model.Hero
 
 interface HeroControllerApi {
     fun heroGet(): HeroResponse
-    fun heroUpdatePost(@RequestParam(value = "Stats", required = false) stats: String) : HeroResponse
+    fun heroUpdatePost(@RequestParam(value = "Stats", required = false) stats: String?) : HeroResponse
 }

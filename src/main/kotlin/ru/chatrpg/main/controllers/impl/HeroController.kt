@@ -21,7 +21,7 @@ class HeroController: HeroControllerApi {
     }
 
     @PostMapping("/hero/update")
-    override fun heroUpdatePost(@RequestParam(value = "Stats", required = false) stats: String): HeroResponse {
+    override fun heroUpdatePost(@RequestParam(value = "Stats", required = false) stats: String?): HeroResponse {
         return heroService.updateHeroStats(stats)
     }
 }
